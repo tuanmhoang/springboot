@@ -10,4 +10,8 @@ public interface FileStorageService {
     List<String> listFiles(String accountId);
 
     byte[] downloadFile(String accountId, String fileName) throws IOException;
+
+    String getUploadPresignedUrl(String accountId, String fileName);
+
+    String getDownloadPresignedUrl(String accountId, String fileName);
 }

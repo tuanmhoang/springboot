@@ -2,7 +2,9 @@ package com.tuanmhoang.springboot.uploads3.controller.impl;
 
 import com.tuanmhoang.springboot.uploads3.controller.S3Controller;
 import com.tuanmhoang.springboot.uploads3.dto.DownloadFileResponse;
+import com.tuanmhoang.springboot.uploads3.dto.GetDownloadPresignedUrlResponse;
 import com.tuanmhoang.springboot.uploads3.dto.GetFilesResponse;
+import com.tuanmhoang.springboot.uploads3.dto.GetUploadPresignedUrlResponse;
 import com.tuanmhoang.springboot.uploads3.dto.UploadResponse;
 import com.tuanmhoang.springboot.uploads3.exception.FileStorageServiceException;
 import com.tuanmhoang.springboot.uploads3.services.FileStorageService;
@@ -58,5 +60,25 @@ public class S3ControllerImpl implements S3Controller {
             .fileData(downloadedFile)
             .message("OK")
             .build());
+    }
+
+    @Override
+    public ResponseEntity<GetUploadPresignedUrlResponse> getUploadPresignedUrl(String accountId, String fileName) {
+        String presignedUrl = fileStorageService.getUploadPresignedUrl(accountId, fileName);
+        return ResponseEntity.ok(GetUploadPresignedUrlResponse.builder()
+            .message("OK")
+            .presignedUrl(presignedUrl)
+            .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<GetDownloadPresignedUrlResponse> getDownloadPresignedUrl(String accountId, String fileName) {
+        String presignedUrl = fileStorageService.getDownloadPresignedUrl(accountId, fileName);
+        return ResponseEntity.ok(GetDownloadPresignedUrlResponse.builder()
+            .message("OK")
+            .presignedUrl(presignedUrl)
+            .build()
+        );
     }
 }

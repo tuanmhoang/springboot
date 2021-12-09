@@ -1,7 +1,9 @@
 package com.tuanmhoang.springboot.uploads3.controller;
 
 import com.tuanmhoang.springboot.uploads3.dto.DownloadFileResponse;
+import com.tuanmhoang.springboot.uploads3.dto.GetDownloadPresignedUrlResponse;
 import com.tuanmhoang.springboot.uploads3.dto.GetFilesResponse;
+import com.tuanmhoang.springboot.uploads3.dto.GetUploadPresignedUrlResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,4 +25,10 @@ public interface S3Controller {
 
     @GetMapping("/downloadFile/{accountId}/{fileName}")
     ResponseEntity<DownloadFileResponse> downloadFile(@PathVariable String accountId, @PathVariable String fileName);
+
+    @GetMapping("/upload/{accountId}/presignedurl/{fileName}")
+    ResponseEntity<GetUploadPresignedUrlResponse> getUploadPresignedUrl(@PathVariable String accountId,@PathVariable String fileName);
+
+    @GetMapping("/download/{accountId}/presignedurl/{fileName}")
+    ResponseEntity<GetDownloadPresignedUrlResponse> getDownloadPresignedUrl(@PathVariable String accountId,@PathVariable String fileName);
 }

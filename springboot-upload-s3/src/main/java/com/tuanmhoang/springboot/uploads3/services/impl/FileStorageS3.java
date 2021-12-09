@@ -1,7 +1,9 @@
 package com.tuanmhoang.springboot.uploads3.services.impl;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -13,7 +15,9 @@ import com.tuanmhoang.springboot.uploads3.exception.FileStorageServiceException;
 import com.tuanmhoang.springboot.uploads3.exception.InvalidFileTypeException;
 import com.tuanmhoang.springboot.uploads3.services.FileStorageService;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +33,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Qualifier("fileStorageS3")
 public class FileStorageS3 implements FileStorageService {
+
+    public static final int SECONDS_IN_A_MINUTES = 60;
+
+    public static final int MINUTES_IN_AN_HOUR = 60;
+
+    public static final int MILLISECONDS_IN_A_SECOND = 1000;
 
     private final AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
 
@@ -46,6 +56,9 @@ public class FileStorageS3 implements FileStorageService {
 
     @Value("${amazon.s3.bucketname}")
     private String bucketName;
+
+    @Value("${amazon.s3.url.expiration.minutes}")
+    private int expirationAsMinutes;
 
     @Override
     public void upload(String accountId, MultipartFile file) throws FileStorageServiceException {
@@ -94,6 +107,50 @@ public class FileStorageS3 implements FileStorageService {
         } catch (IOException e) {
             throw new FileStorageServiceException("Exception while download", e);
         }
+    }
+
+    @Override
+    public String getUploadPresignedUrl(String accountId, String fileName) {
+        // Generate the pre-signed URL.
+        log.info("Generating pre-signed URL.");
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratedPresignedUrlRequest(
+            accountId,
+            fileName,
+            getExpirationDate(),
+            HttpMethod.PUT
+        );
+        URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
+
+    @Override
+    public String getDownloadPresignedUrl(String accountId, String fileName) {
+        // Generate the pre-signed URL.
+        log.info("Generating pre-signed URL.");
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratedPresignedUrlRequest(
+            accountId,
+            fileName,
+            getExpirationDate(),
+            HttpMethod.GET
+        );
+        URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
+    }
+
+    private Date getExpirationDate() {
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += (MILLISECONDS_IN_A_SECOND * SECONDS_IN_A_MINUTES * MINUTES_IN_AN_HOUR) * expirationAsMinutes / MINUTES_IN_AN_HOUR;
+        expiration.setTime(expTimeMillis);
+        return expiration;
+    }
+
+    private GeneratePresignedUrlRequest getGeneratedPresignedUrlRequest(String accountId, String fileName, Date expiration,
+        HttpMethod httpMethod) {
+        return new GeneratePresignedUrlRequest(bucketName,
+            accountId + SLASH + fileName)
+            .withExpiration(expiration)
+            .withMethod(httpMethod);
     }
 
     private boolean isFileTypeValid(String mimeType) {

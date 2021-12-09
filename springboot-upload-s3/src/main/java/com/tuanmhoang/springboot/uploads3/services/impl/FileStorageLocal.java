@@ -3,7 +3,6 @@ package com.tuanmhoang.springboot.uploads3.services.impl;
 import com.tuanmhoang.springboot.uploads3.services.FileStorageService;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +40,18 @@ public class FileStorageLocal implements FileStorageService {
     @Override
     public byte[] downloadFile(String accountId, String fileName) {
         log.info("Dowloading files using local. Skipping this, focus S3.");
+        return null;
+    }
+
+    @Override
+    public String getUploadPresignedUrl(String accountId, String fileName) {
+        log.info("Skipping this, focus S3.");
+        return null;
+    }
+
+    @Override
+    public String getDownloadPresignedUrl(String accountId, String fileName) {
+        log.info("Skipping this, focus S3.");
         return null;
     }
 }

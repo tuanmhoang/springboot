@@ -15,6 +15,8 @@ Need APIs work with Amazon S3.
 - upload file: POST `http://localhost:9999/s3/upload/abc123`
 - list file: GET `http://localhost:9999/s3/listFiles/abc123`
 - download file: GET `http://localhost:9999/s3/downloadFile/abc123/my-cv.pdf`
+- get presigned url to download: GET `http://localhost:9999/s3/download/abc123/presignedurl/personal-img.jpg` 
+- get presigned url to upload: GET `http://localhost:9999/s3/upload/abc123/presignedurl/personal-img.jpg`
 
 ### Sample response
 
@@ -42,6 +44,21 @@ Need APIs work with Amazon S3.
     
 ```
 
+- get presigned url to download
+```
+{
+    "message": "OK",
+    "presignedUrl": "https://...jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20211209T044044Z&X-Amz-SignedHeaders=host&X-Amz-Expires=899&X-Amz-Credential=AKIAQ...&X-Amz-Signature=8da1116a2ffff.."
+}
+```
+- get presigned url to upload
+```
+{
+    "message": "OK",
+    "presignedUrl": "https://...jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20211209T044044Z&X-Amz-SignedHeaders=host&X-Amz-Expires=899&X-Amz-Credential=AKIAQ...&X-Amz-Signature=8da1116a2ffff.."
+}
+```
+
 ### Notes
 
 - Upload using Amazon S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html
@@ -50,5 +67,4 @@ Need APIs work with Amazon S3.
 - Put object with input stream: https://stackoverflow.com/questions/8351886/amazons3-putobject-with-inputstream-length-example
 - Get object from Amazon S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/download-objects.html
 - Get file type: Use `apache tika`
-
-
+- Use presigned URL https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html
