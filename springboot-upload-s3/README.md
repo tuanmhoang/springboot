@@ -68,3 +68,79 @@ Need APIs work with Amazon S3.
 - Get object from Amazon S3: https://docs.aws.amazon.com/AmazonS3/latest/userguide/download-objects.html
 - Get file type: Use `apache tika`
 - Use presigned URL https://docs.aws.amazon.com/AmazonS3/latest/userguide/PresignedUrlUploadObject.html
+
+## Setup for AWS
+
+There are 2 types of users:
+- already have permission to work with S3 (for example admin): don't need to do anything
+- create a new user from scratch, who does not have permission to work with S3: follow below steps
+
+### Setup Policy
+
+1. IAM > Policies > Create Policy
+
+![image](https://user-images.githubusercontent.com/37680968/147632232-66471d36-afd7-4158-bba8-89adbf852107.png)
+
+2. Choose S3 > JSON > Next
+
+Use this following json
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Resource": "*",
+            "Action": "sts:AssumeRole"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::tuanmhoanguploadfiles/*"
+        }
+    ]
+}
+```
+
+Notice that `tuanmhoanguploadfiles` is the bucket that we will upload files
+
+3. Name the policy and create it. For example `S3_upload_to_demo_bucket`
+
+![image](https://user-images.githubusercontent.com/37680968/147634104-59d85def-6c92-4a19-a12a-c3c354dae39f.png)
+
+### Setup groups (optional)
+
+Go to IAM, User Groups, create group `Developers`> Policy `S3_upload_to_demo_bucket` > create group
+
+Reference: https://aws.amazon.com/blogs/security/how-to-restrict-amazon-s3-bucket-access-to-a-specific-iam-role/
+
+### Setup users
+
+Go to IAM > Users > Create user > assign to a group `Developers` > Save access key and secret key
+
+![image](https://user-images.githubusercontent.com/37680968/147636919-736885e7-9076-43ff-878f-b36b334282e2.png)
+
+### Setup S3
+
+1. Go to S3 create bucket named `tuanmhoanguploadfiles`
+
+2. Go to the created bucket, choose tab `Permissions` > block all public access
+
+![image](https://user-images.githubusercontent.com/37680968/147635302-d95f7504-1ff7-4211-b755-38239d75aa1b.png)
+
+### Deploy code to server
+
+#### Setup credentials
+
+Reference: https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html
+
+**1. Use AWS CLI**
+
+Reference: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+After install AWS CLI, config the credentials https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html 
+
+**2. Using credentials**
+
+Reference: https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html
